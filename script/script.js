@@ -1,18 +1,20 @@
 const maxTime=500;
 var timer=maxTime;  // How much time is left before the end of the game?
 var qPos=0;     // Which question are we currently asking?
+var questionsCorrect=0;
+var questionsWrong=0;
 
 var questionArray=[
     {
         "q":"What is one plus three?",
         "options":["One","Two","Apples","Four"],
-        "a":3,
+        "correctAnswerIndex":3,
         "userStatus":0
     },
     {
         "q":"What is one plus one?",
         "options":["One","Two","Three","Four"],
-        "a":3,
+        "correctAnswerIndex":1,
         "userStatus":0
     },
     {
@@ -24,7 +26,7 @@ var questionArray=[
             "Lorem ipsum dolor sit amet!",
             "Consectetur adipisicing elit. Similique nulla inventore praesentium totam iusto, rerum incidunt illum ad ab ducimus dignissimos, fuga fugiat adipisci et mollitia?"            
         ],
-        a:2,
+        "correctAnswerIndex":2,
         "userStatus":0
     }
 ];
@@ -35,7 +37,7 @@ var questionArray=[
 // ~~~===---...---===```===---...---===```===---...---===```
 function init(){
     document.querySelector("#timer").innerHTML="<h4 class='timer'>"+timer+"</h4>";
-    loadQuestion();       // qPos is incremented at the start of loadQuestion() (so that we can easily call it from a button) so we should start at -1;
+    loadQuestion(); 
     setInterval(updateTimer,1000);
 }
 // ~~~===---...---===```===---...---===```===---...---===```===---...
@@ -80,15 +82,25 @@ function endGame(){
 // ~~~   and makes new answer buttons.                            ...
 // ~~~   Called by init() and ______                              ...
 // ~~~===---...---===```===---...---===```===---...---===```===---...
-function loadQuestion(position){
-    // This gets called mainly from the answer button, so the first thing to do is to increment qPos.
-    qPos++;
-    // First, check to see if we're out of questions, in which case the user has won!
-    if(qPos>=questionArray.length-1){
+function loadQuestion(){
+    // First, check to see is the user has answered every question, in which case they win
+    if(questionsCorrect==questionArray.length){
         endGame();
     }
+    // Then, check to see if we're out of questions, in which we can replay the questions the user missed
+    else if(qPos>questionArray.length-1){
+        qPos=0;
+        console.log("resetting");
+    }    
+    
+    // Finally, check to see if they have correctly answered this particular question already
+    if(questionArray[qPos].userStatus){
+        // They've already answered this one, so get the next question in the stack
+        // This is a pretty inefficient way to do this (linked lists would be better, for a start)
+        // But with so few questions it hardly matters
+        loadQuestion();
+    }
     else{
-        
         // Update the question text
         document.querySelector("#q-num").textContent="Question #"+(qPos+1);
         document.querySelector("#q-text").textContent=questionArray[qPos].q;
@@ -104,16 +116,37 @@ function loadQuestion(position){
         var buttonNum=0;
         for(answer of questionArray[qPos].options)
         {
-            newButton=document.createElement("button");
+            var newButton=document.createElement("button");
             newButton.class="button";
             newButton.style.margin="5px";
             newButton.textContent=answer;
+            // The index of the correct answer is stored as .correctAnswerIndex, so if the current button number
+            // matches this value, we are in the process of creating the correct button
+            if(buttonNum===questionArray[qPos].correctAnswerIndex) result=true;
+            else result=false;
+                                                                                        // // Our button will have a data-result property that tells whether or not it's the correct one
+                                                                                        // // The TAs promised that users never ever used the Dev Tool inspector, so I'm not worried about them cheating
+                                                                                        newButton.setAttribute("data-result",result);
             answerBox.appendChild(newButton);
-            // Is this button the right answer!
-            if(buttonNum===questionArray[qPos].a){
-                newButton.addEventListener("click",loadQuestion);
-            }
+           
+           // newButton.addEventListener("click",()=>{questionAnswered(result)});       That's not working for some reason
+           
+
             buttonNum++;   
         }
+    }
+    function questionAnswered(correctly){
+        console.log(correctly);
+        if(correctly){
+            questionsCorrect++;
+            questionArray[qPos].userStatus=true;
+            document.querySelector("#correct").innerHTML="<h4>Correct: "+questionsCorrect+"</h4>";
+        }
+        else{
+            questionsWrong++;
+            document.querySelector("#wrong").innerHTML="<h4>Incorrect: "+questionsWrong+"</h4>";
+        }
+        qPos++; 
+        loadQuestion();
     }
 }

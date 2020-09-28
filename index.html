@@ -29,13 +29,35 @@
 </head>
 <body onload="init();">
 
-    <div class="container-fluid row-12 d-flex justify-content-end"  >
-      <div class="col-3 ">
-        <div class="card text-center" id="timer">
-        
+    <div class="container row-12 "  >
+
+      <div class="row">
+        <div class="col-3 ">
+          <div class="card text-center" id="correct">      
+            <h4>
+              Correct:  
+            </h4>
+          </div>
+        </div>
+        <div class="col-3 ">
+          <div class="card text-center" id="wrong">      
+            <h4>
+              Incorrect:  
+            </h4>
+          </div>
+        </div>
+  
+        <div class="col-3 ">
+          <!-- This space intentionally left blank -->
+        </div>
+        <div class="col-3 ">
+          <div class="card text-center" id="timer">        
+          </div>
         </div>
       </div>
+
     </div>
+
     <div class="row-12" id="main">
       <div class="card col-5 ml-auto mr-auto mt-2 p-2" >
         <div class="card-body" id="card">
