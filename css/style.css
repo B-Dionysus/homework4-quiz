@@ -1,0 +1,23 @@
+#backdrop{
+    background-color: blueviolet;
+    opacity: 100%;
+    position:absolute;
+    top:0px;
+    left:0px;
+    height:100%;
+    width:100%;
+    z-index:-1;
+}
+#reveal{
+    background-color:orangered;
+
+    position:absolute;
+    top:0px;
+    left:0px;
+    height:100%;
+    width:100%;
+    z-index:-2;
+}
+#main{  
+    opacity: 100%;
+}

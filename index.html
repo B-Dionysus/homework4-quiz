@@ -20,24 +20,37 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
       integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
       crossorigin="anonymous"></script>
-
+      
+      <!-- Font Awesome kit info -->
+      <script src="https://kit.fontawesome.com/a86abafd67.js" crossorigin="anonymous"></script>
+  
       <!-- My stylesheet -->
       <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
-    <div class="container row-12">
-      <div class="card col-12 mt-5" >
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+<body onload="init();">
+
+    <div class="container-fluid row-12 d-flex justify-content-end"  >
+      <div class="col-3 ">
+        <div class="card text-center" id="timer">
+        
         </div>
       </div>
-
-
-
     </div>
+    <div class="row-12" id="main">
+      <div class="card col-5 ml-auto mr-auto mt-2 p-2" >
+        <div class="card-body" id="card">
+          <h5 class="question-number" id="q-num">Card title</h5>
+          <p class="question-text" id="q-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <ul class="question-answers p-2 m-2" id="q-answers">
 
-
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid" id="backdrop">
+    </div>
+    <div class="container-fluid" id="reveal">
+    </div>
     <script src="./script/script.js"></script>
 </body>
 </html>
