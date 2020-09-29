@@ -1,9 +1,10 @@
-const maxTime=500;
+const maxTime=2;
 var timer=maxTime;  // How much time is left before the end of the game?
 var qPos=0;     // Which question are we currently asking?
 var questionsCorrect=0;
 var questionsWrong=0;
 var timerInterval;
+var finalScore=0;
 
 // ~~~===---...---===```===---...---===```===---...---===```
 // ~~~                  init()                           ```
@@ -122,6 +123,9 @@ function questionAnswered(correctly){
     }
     else{
         questionsWrong++;
+        timer--;
+        
+        document.querySelector("#timer").innerHTML="<i class='far fa-sad-tear h2'></i>";
         document.querySelector("#wrong").innerHTML="<h4>Incorrect: "+questionsWrong+"</h4>";
     }
     qPos++; 
@@ -135,20 +139,38 @@ function questionAnswered(correctly){
 function endGame(){
     clearInterval(timerInterval);
     // We either got here by answering every question correctly, or by running out of time
-    if(timer<=0){
-        // The user has lost the game!
-    }
-    else{        
-        document.querySelector("#q-num").textContent="Game Over";
-        document.querySelector("#q-answers").remove();
-        document.querySelector("#topInterface").style.display="none";
-        var finalScore=timer+questionsCorrect-questionsWrong;
+    
+    document.querySelector("#q-num").textContent="Game Over";
+    document.querySelector("#q-answers").remove();
+    document.querySelector("#topInterface").style.display="none";
+    finalScore=timer+questionsCorrect-questionsWrong;
+    message=document.querySelector("#q-text");
+    message.innerHTML="";
+    message.innerHTML="<h3>User Score</h3>";
+    message.innerHTML+="<div><strong>Time: </strong>"+timer+"</div>";
+    message.innerHTML+="<div><strong>Plus correct questions: </strong>"+questionsCorrect+"</div>";
+    message.innerHTML+="<div style='border-bottom'><strong>Minus incorrect questions: </strong>"+questionsWrong+"</div>";
+    message.innerHTML+="<div><strong>Final Score: </strong>"+finalScore+"</div>";
+    message.innerHTML+="<div>Please enter your name!</div>";
+    message.innerHTML+="<div class='row'><div class='col-8'><input type='text' id='userName'>";
+    message.innerHTML+="<div class='col-4'><input type='submit' onclick='displayScore();'></div></div>";
+}
+
+function displayScore(e){
+    
+    e.preventDefault(); // The page doesn't seem to be reloading when I run it, but just to be safe let's make sure
+    
+    var userName=document.querySelector("#userName").value;
+    if(userName!=""){
+        document.querySelector("#q-num").textContent="High Scores";
         message=document.querySelector("#q-text");
         message.innerHTML="";
-        message.innerHTML="<h3>User Score</h3>";
-        message.innerHTML+="<div><strong>Time: </strong>"+timer+"</div>";
-        message.innerHTML+="<div><strong>Plus correct questions: </strong>"+questionsCorrect+"</div>";
-        message.innerHTML+="<div style='border-bottom'><strong>Minus incorrect questions: </strong>"+questionsWrong+"</div>";
-        message.innerHTML+="<div><strong>Final Score: </strong>"+finalScore+"</div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
     }
 }
