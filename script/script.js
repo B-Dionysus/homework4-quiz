@@ -1,4 +1,4 @@
-const maxTime=2;
+const maxTime=200;
 var timer=maxTime;  // How much time is left before the end of the game?
 var qPos=0;     // Which question are we currently asking?
 var questionsCorrect=0;
@@ -16,6 +16,14 @@ function init(){
     // Because we're setting this up in this function, we need to assign the interval
     // to a global variable. Otherwise, we won't be able to stop it when we need to.
     timerInterval=setInterval(updateTimer,1000);
+
+    // If the user has played the game before, show them their high score!
+    var userHighScore=localStorage.getItem("highScore");
+    if(userHighScore){
+        // Open a modal dialogue to show them their high score
+        $('#high-scores').modal();
+        document.querySelector("#high-score-body").textContent="Your previous high score was "+userHighScore+". Can you do better this time?";
+    }
 }
 // ~~~===---...---===```===---...---===```===---...---===```===---...
 // ~~~   updateTimer()                                            ...
@@ -37,8 +45,9 @@ function updateTimer(){
         document.querySelector("#backdrop").style.opacity=backOp;
     }
 }
-
-
+function myfilter(q){
+    return !q.userStatus;
+}
 // ~~~===---...---===```===---...---===```===---...---===```===---...
 // ~~~   loadQuestion()                                           ...
 // ~~~   Fills in the question text, removes any previous answers ...
@@ -47,43 +56,40 @@ function updateTimer(){
 // ~~~===---...---===```===---...---===```===---...---===```===---...
 function loadQuestion(){
     // First, check to see is the user has answered every question, in which case they win
-    if(questionsCorrect>=questionArray.length){
-        endGame();
+    if(questionArray.length<=0){
+        return endGame();
     }
     // Then, check to see if we're out of questions, in which we can replay the questions the user missed
     else if(qPos>questionArray.length-1){
         qPos=0;
         console.log("resetting");
+        // And we filter the array down, removing all of the correct answers.
+        // Set questionArray to be an array that only contains elements where userStatus
+        // is false (!q.userStatus return true for false things)
+        questionArray=questionArray.filter(q=>!q.userStatus);
     }    
-    else{
-        // Finally, check to see if they have correctly answered this particular question already
-        if(questionArray[qPos].userStatus){
-            // They've already answered this one, so get the next question in the stack
-            // This is a pretty inefficient way to do this (linked lists would be better, for a start)
-            // But with so few questions it hardly matters
-            loadQuestion();
-        }
-        else{
-            // Update the question text
-            document.querySelector("#q-num").textContent="Question #"+(qPos+1);
-            document.querySelector("#q-text").textContent=questionArray[qPos].q;
-            // Remove any previous question buttons
-            // These folks suggested just using .innerHTML, althought they warned that 
-            // using the browser's html engine isn't suitable for high-performance.
-            // This quiz app is not high performance!
-            // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript    
-            var answerBox=document.querySelector("#q-answers");
-            answerBox.innerHTML="";
 
-            // Load new answer buttons
-            var buttonNum=0;
-            for(answer of questionArray[qPos].options)
-            {
-                makeAnswerButton(buttonNum, answerBox);
-                buttonNum++;   
-            }
-        }
+    
+    // Update the question text
+    document.querySelector("#q-num").textContent="Question #"+(qPos+1);
+    document.querySelector("#q-text").textContent=questionArray[qPos].q;
+    // Remove any previous question buttons
+    // These folks suggested just using .innerHTML, althought they warned that 
+    // using the browser's html engine isn't suitable for high-performance.
+    // This quiz app is not high performance!
+    // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript    
+    var answerBox=document.querySelector("#q-answers");
+    answerBox.innerHTML="";
+
+    // Load new answer buttons
+    var buttonNum=0;
+    for(answer of questionArray[qPos].options)
+    {
+        makeAnswerButton(buttonNum, answerBox);
+        buttonNum++;   
     }
+
+    
 }
 // ~~~===---...---===```===---...---===```===---...---===
 // ~~~   makeAnswerButton()                           ===  
@@ -119,7 +125,11 @@ function questionAnswered(correctly){
     if(correctly){
         questionsCorrect++;
         questionArray[qPos].userStatus=true;
-        document.querySelector("#correct").innerHTML="<h4>Correct: "+questionsCorrect+"</h4>";
+        document.querySelector("#correct").innerHTML="<h4>Correct: "+questionsCorrect+"</h4>"; 
+        // If we just answered the only question correctly, we are done!
+        if(questionArray.length<=1){
+            return endGame();
+        }
     }
     else{
         questionsWrong++;
@@ -154,8 +164,18 @@ function endGame(){
     message.innerHTML+="<div>Please enter your name!</div>";
     message.innerHTML+="<div class='row'><div class='col-8'><input type='text' id='userName'>";
     message.innerHTML+="<div class='col-4'><input type='submit' onclick='displayScore();'></div></div>";
-}
 
+    var userHighScore=localStorage.getItem("highScore");
+    if(userHighScore && finalScore>userHighScore) userHighScore=finalScore;
+    localStorage.setItem("highScore",userHighScore);
+    return 1;
+    
+}
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
+// ~~~   displayScore()                                                    ```
+// ~~~   Downloads the high scores from all players and displays it here   ```
+// ~~~   Called by the endGame()                                           ```
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
 function displayScore(e){
     
     e.preventDefault(); // The page doesn't seem to be reloading when I run it, but just to be safe let's make sure
