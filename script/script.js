@@ -5,33 +5,6 @@ var questionsCorrect=0;
 var questionsWrong=0;
 var timerInterval;
 
-var questionArray=[
-    {
-        "q":"What is one plus three?",
-        "options":["One","Two","Apples","Four"],
-        "correctAnswerIndex":3,
-        "userStatus":0
-    },
-    {
-        "q":"What is one plus one?",
-        "options":["One","Two","Three","Four"],
-        "correctAnswerIndex":1,
-        "userStatus":0
-    },
-    {
-        q:"Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique nulla inventore praesentium totam iusto, rerum incidunt illum ad ab ducimus dignissimos, fuga fugiat adipisci et mollitia commodi hic accusantium dicta?",
-        options:[
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-            "Illum ad ab ducimus dignissimos, fuga fugiat adipisci et mollitia commodi hic accusantium dicta?",
-            "Mollitia commodi hic accusantium dicta?",
-            "Lorem ipsum dolor sit amet!",
-            "Consectetur adipisicing elit. Similique nulla inventore praesentium totam iusto, rerum incidunt illum ad ab ducimus dignissimos, fuga fugiat adipisci et mollitia?"            
-        ],
-        "correctAnswerIndex":2,
-        "userStatus":0
-    }
-];
-
 // ~~~===---...---===```===---...---===```===---...---===```
 // ~~~                  init()                           ```
 // ~~~                    Called by <body> .onload();    ```
