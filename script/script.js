@@ -1,10 +1,20 @@
-const maxTime=200;
+const maxTime=2;
 var timer=maxTime;  // How much time is left before the end of the game?
 var qPos=0;     // Which question are we currently asking?
 var questionsCorrect=0;
 var questionsWrong=0;
 var timerInterval;
 var finalScore=0;
+
+
+// Test field, JSON high score biz
+var highScoreList=new XMLHttpRequest(); 
+highScoreList.onreadystatechange=displayScore;
+highScoreList.open("POST", "http://bork.hampshire.edu/~damien/sixbynine/highScore.php?user=bill&score=200", true);
+
+highScoreList.send();
+
+
 
 // ~~~===---...---===```===---...---===```===---...---===```
 // ~~~                  init()                           ```
@@ -15,15 +25,21 @@ function init(){
     loadQuestion(); 
     // Because we're setting this up in this function, we need to assign the interval
     // to a global variable. Otherwise, we won't be able to stop it when we need to.
-    timerInterval=setInterval(updateTimer,1000);
 
     // If the user has played the game before, show them their high score!
+    // Be sure to start the timer when they click on the button to close the high score modal
     var userHighScore=localStorage.getItem("highScore");
     if(userHighScore){
         // Open a modal dialogue to show them their high score
         $('#high-scores').modal();
         document.querySelector("#high-score-body").textContent="Your previous high score was "+userHighScore+". Can you do better this time?";
+        
+        document.querySelector("#greeting-button").addEventListener("click",function(){
+            timerInterval=setInterval(updateTimer,1000);
+        });
     }
+    // If they didn't set a high score, we can just start the timer right away.
+    else timerInterval=setInterval(updateTimer,1000);
 }
 // ~~~===---...---===```===---...---===```===---...---===```===---...
 // ~~~   updateTimer()                                            ...
@@ -176,21 +192,44 @@ function endGame(){
 // ~~~   Downloads the high scores from all players and displays it here   ```
 // ~~~   Called by the endGame()                                           ```
 // ~~~===---...---===```===---...---===```===---...---===```===---...---===```
-function displayScore(e){
+var myObj;
+function displayScore(){
+    // var allHighScores='{
+    //     {
+    //         "userName":"Bob",
+    //         "userScore":"300"
+    //     },
+    //     {
+    //         "userName":"Alice",
+    //         "userScore":"250"
+    //     },
+    //     {
+    //         "userName":"Carol",
+    //         "userScore":"200"
+    //     },
+    // }';
+
+        if (this.readyState == 4 && this.status == 200) {
+          allHhighScores = JSON.parse(this.responseText);
+          for(score of allHhighScores){
+              console.log(score.user+" "+score.score);
+          }
+        }
+      
+
     
-    e.preventDefault(); // The page doesn't seem to be reloading when I run it, but just to be safe let's make sure
     
-    var userName=document.querySelector("#userName").value;
-    if(userName!=""){
-        document.querySelector("#q-num").textContent="High Scores";
-        message=document.querySelector("#q-text");
-        message.innerHTML="";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-        message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    }
+    // var userName=document.querySelector("#userName").value;
+    // if(userName!=""){
+    //     document.querySelector("#q-num").textContent="High Scores";
+    //     message=document.querySelector("#q-text");
+    //     message.innerHTML="";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
+    // }
 }
