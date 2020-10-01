@@ -5,16 +5,7 @@ var questionsCorrect=0;
 var questionsWrong=0;
 var timerInterval;
 var finalScore=0;
-
-
-// Test field, JSON high score biz
-var highScoreList=new XMLHttpRequest(); 
-highScoreList.onreadystatechange=displayScore;
-highScoreList.open("POST", "http://bork.hampshire.edu/~damien/sixbynine/highScore.php?user=bill&score=200", true);
-
-highScoreList.send();
-
-
+var userHighScore;
 
 // ~~~===---...---===```===---...---===```===---...---===```
 // ~~~                  init()                           ```
@@ -177,59 +168,77 @@ function endGame(){
     message.innerHTML+="<div><strong>Plus correct questions: </strong>"+questionsCorrect+"</div>";
     message.innerHTML+="<div style='border-bottom'><strong>Minus incorrect questions: </strong>"+questionsWrong+"</div>";
     message.innerHTML+="<div><strong>Final Score: </strong>"+finalScore+"</div>";
-    message.innerHTML+="<div>Please enter your name!</div>";
-    message.innerHTML+="<div class='row'><div class='col-8'><input type='text' id='userName'>";
-    message.innerHTML+="<div class='col-4'><input type='submit' onclick='displayScore();'></div></div>";
 
-    var userHighScore=localStorage.getItem("highScore");
+    userHighScore=localStorage.getItem("highScore");
+    userStoredName=localStorage.getItem("storedName");
     if(userHighScore && finalScore>userHighScore) userHighScore=finalScore;
     localStorage.setItem("highScore",userHighScore);
-    return 1;
     
+    message.innerHTML+="<div>Please enter your name!</div>";
+    message.innerHTML+="<div class='row'><div class='col-8'><form id='user-form' method='POST'></form></div>";
+
+    var userForm=document.querySelector("#user-form");
+    var newUserName=document.createElement("input");
+    newUserName.type="text";
+    newUserName.setAttribute("id","user-name");
+
+    if(userStoredName)
+        newUserName.setAttribute("value",userStoredName);
+
+    userForm.appendChild(newUserName);
+    var newButton=document.createElement("button");
+    newButton.type="submit";
+    newButton.textContent="Submit";
+    userForm.append(newButton);
+    userForm.addEventListener("submit", checkName);
+
+
+//     var todoForm = document.querySelector("#todo-form");
+//     todoForm.addEventListener("submit",addTask); 
+}
+function checkName(event){
+    event.preventDefault();
+    var newUserName=document.querySelector("#user-name");
+    if(newUserName.value!=""){
+        localStorage.setItem("storedName",newUserName.value);
+        var userScore=userHighScore;
+        var uriString="http://bork.hampshire.edu/~damien/sixbynine/highScore.php?user="+newUserName.value+"&score="+userScore;
+        console.log(uriString);
+        var highScoreList=new XMLHttpRequest(); 
+        highScoreList.onreadystatechange=displayScore;
+        highScoreList.open("POST", uriString, true);
+         highScoreList.send();
+    }
 }
 // ~~~===---...---===```===---...---===```===---...---===```===---...---===```
 // ~~~   displayScore()                                                    ```
 // ~~~   Downloads the high scores from all players and displays it here   ```
 // ~~~   Called by the endGame()                                           ```
 // ~~~===---...---===```===---...---===```===---...---===```===---...---===```
-var myObj;
+
+function loadScore(name){
+
+
+}
+
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
+// ~~~   displayScore()                                                    ```
+// ~~~   Downloads the high scores from all players and displays it here   ```
+// ~~~   Called by loadScore()'s XMLHttpRequest                            ```
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
 function displayScore(){
-    // var allHighScores='{
-    //     {
-    //         "userName":"Bob",
-    //         "userScore":"300"
-    //     },
-    //     {
-    //         "userName":"Alice",
-    //         "userScore":"250"
-    //     },
-    //     {
-    //         "userName":"Carol",
-    //         "userScore":"200"
-    //     },
-    // }';
-
-        if (this.readyState == 4 && this.status == 200) {
-          allHhighScores = JSON.parse(this.responseText);
-          for(score of allHhighScores){
-              console.log(score.user+" "+score.score);
-          }
+    if (this.readyState == 4 && this.status == 200) {
+        allHhighScores = JSON.parse(this.responseText);
+       // var userName=document.querySelector("#userName").value;
+       // if(userName!=""){
+        if(true){
+            document.querySelector("#q-num").textContent="High Scores";
+            message=document.querySelector("#q-text");
+            message.innerHTML="";
+            for(score of allHhighScores){
+                message.innerHTML+="<div class='row'><div class='col-8'>"+score.user+"</div><div class='col-4'>"+score.score+"</div></div>";
+                console.log(score.user+" "+score.score);
+            }
         }
-      
-
-    
-    
-    // var userName=document.querySelector("#userName").value;
-    // if(userName!=""){
-    //     document.querySelector("#q-num").textContent="High Scores";
-    //     message=document.querySelector("#q-text");
-    //     message.innerHTML="";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    //     message.innerHTML+="<div class='row'><div class='col-8'>Name</div><div class='col-4'>Score</div></div>";
-    // }
+    }    
 }

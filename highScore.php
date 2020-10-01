@@ -5,7 +5,7 @@ $mysqli = new mysqli("localhost", "damien", "fhben", "damiendb");
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 }
-if(isset($_REQUEST['name'])) $name=$mysqli->real_escape_string($_REQUEST['name']); 
+if(isset($_REQUEST['user'])) $name=$mysqli->real_escape_string($_REQUEST['user']); 
 else $name="NULL";
 if(isset($_REQUEST['score'])) $score=$_REQUEST['score']; 
 else $pass="NULL";
@@ -33,15 +33,15 @@ if(!is_null($name) && !is_null($score)){
 $getScore="select max(score) as highest, name from highScore_codeBootcamp group by name order by highest desc";
 $result = $mysqli->query($getScore);
 
-// if ($result->num_rows > 0) {
-    echo '[';
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-      echo '{"user":"'.$row["name"].'","score":"'.$row["highest"].'"},';
-    }
-    echo ']';
-// }
-
+$scoreArray='[';
+// output data of each row
+while($row = $result->fetch_assoc()) {
+    $scoreArray.='{"user":"'.$row["name"].'","score":"'.$row["highest"].'"},';
+}
+ $scoreArray=trim($scoreArray,",");
+ //$scoreArray.='{"user":"Ben","score":"20"},';
+$scoreArray.=']';
+echo $scoreArray;
 $mysqli->close();
 
 
