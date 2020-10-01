@@ -188,6 +188,7 @@ function endGame(){
     var userForm=document.querySelector("#user-form");
     var newUserName=document.createElement("input");
     newUserName.type="text";
+    newUserName.setAttribute("maxlength","20");
     newUserName.setAttribute("id","user-name");
 
     if(userStoredName)
