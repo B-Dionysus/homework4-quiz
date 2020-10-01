@@ -1,0 +1,29 @@
+// Push settings file - first generated on Wed Sep 30 2020 14:23:18 GMT-0500 (Central Daylight Time).
+// Note: Optional items are commented out and can be uncommented if you wish to set them.
+// Preset environments are: prod, dev, stage. Custom environments (and their colours) can be created in settings.
+{
+	"env": "default",
+	"default": {
+		"service": "SFTP",
+		"options": {
+			// "timeZoneOffset": 0,
+			// "testCollisionTimeDiffs": true,
+			// "collisionUploadAction": null,
+			// "collisionDownloadAction": null,
+			// "followSymlinks": false,
+			 "reminder": false,
+			// "reminderTimeout": null,
+			"host": "bork.hampshire.edu",
+			// "port": 22,
+			"username": "damien",
+			 "password": ")rWh0",
+			// "privateKey": "",
+			// "keyPassphrase": "",
+			"root": "/home/damien/public_html/sixbynine",
+			 "keepaliveInterval": 30000
+			// "debug": false,
+			// "fileMode": "",
+			// "sshGateway": null
+		}
+	}
+}
