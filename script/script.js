@@ -224,7 +224,7 @@ function loadScore(event){
         // If not, we should store this one
         else localStorage.setItem("storedName",newUserName.value);
 
-        var uriString="http://bork.hampshire.edu/~damien/sixbynine/highScore.php?user="+newUserName.value+"&score="+userScore;
+        var uriString="https://bork.hampshire.edu/~damien/sixbynine/highScore.php?user="+newUserName.value+"&score="+userScore;
 
         
         var highScoreList=new XMLHttpRequest(); 
