@@ -1,11 +1,11 @@
-const maxTime=2;
+const maxTime=20;
 var timer=maxTime;  // How much time is left before the end of the game?
 var qPos=0;     // Which question are we currently asking?
 var questionsCorrect=0;
 var questionsWrong=0;
 var timerInterval;
 var finalScore=0;
-var userHighScore;
+var storedHighScore;
 
 // ~~~===---...---===```===---...---===```===---...---===```
 // ~~~                  init()                           ```
@@ -19,11 +19,11 @@ function init(){
 
     // If the user has played the game before, show them their high score!
     // Be sure to start the timer when they click on the button to close the high score modal
-    var userHighScore=localStorage.getItem("highScore");
-    if(userHighScore){
+    var storedHighScore=localStorage.getItem("highScore");
+    if(storedHighScore){
         // Open a modal dialogue to show them their high score
         $('#high-scores').modal();
-        document.querySelector("#high-score-body").textContent="Your previous high score was "+userHighScore+". Can you do better this time?";
+        document.querySelector("#high-score-body").textContent="Your previous high score was "+storedHighScore+". Can you do better this time?";
         
         document.querySelector("#greeting-button").addEventListener("click",function(){
             timerInterval=setInterval(updateTimer,1000);
@@ -63,7 +63,9 @@ function myfilter(q){
 // ~~~===---...---===```===---...---===```===---...---===```===---...
 function loadQuestion(){
     // First, check to see is the user has answered every question, in which case they win
-    if(questionArray.length<=0){
+
+    console.log("Array length: "+questionArray.length);
+    if(questionArray.length<=0){  
         return endGame();
     }
     // Then, check to see if we're out of questions, in which we can replay the questions the user missed
@@ -73,7 +75,10 @@ function loadQuestion(){
         // And we filter the array down, removing all of the correct answers.
         // Set questionArray to be an array that only contains elements where userStatus
         // is false (!q.userStatus return true for false things)
-        questionArray=questionArray.filter(q=>!q.userStatus);
+        questionArray=questionArray.filter(q=>!q.userStatus);    
+        if(questionArray.length<=0){  
+            return endGame();
+        }
     }    
 
     
@@ -157,6 +162,8 @@ function endGame(){
     clearInterval(timerInterval);
     // We either got here by answering every question correctly, or by running out of time
     
+
+    // Set up the game over screen
     document.querySelector("#q-num").textContent="Game Over";
     document.querySelector("#q-answers").remove();
     document.querySelector("#topInterface").style.display="none";
@@ -169,10 +176,11 @@ function endGame(){
     message.innerHTML+="<div style='border-bottom'><strong>Minus incorrect questions: </strong>"+questionsWrong+"</div>";
     message.innerHTML+="<div><strong>Final Score: </strong>"+finalScore+"</div>";
 
-    userHighScore=localStorage.getItem("highScore");
+    storedHighScore=localStorage.getItem("highScore");
     userStoredName=localStorage.getItem("storedName");
-    if(userHighScore && finalScore>userHighScore) userHighScore=finalScore;
-    localStorage.setItem("highScore",userHighScore);
+    if(storedHighScore && finalScore>storedHighScore) storedHighScore=finalScore;
+    else if(!storedHighScore) storedHighScore=finalScore;
+    localStorage.setItem("highScore",storedHighScore);
     
     message.innerHTML+="<div>Please enter your name!</div>";
     message.innerHTML+="<div class='row'><div class='col-8'><form id='user-form' method='POST'></form></div>";
@@ -190,36 +198,42 @@ function endGame(){
     newButton.type="submit";
     newButton.textContent="Submit";
     userForm.append(newButton);
-    userForm.addEventListener("submit", checkName);
-
-
-//     var todoForm = document.querySelector("#todo-form");
-//     todoForm.addEventListener("submit",addTask); 
+    userForm.addEventListener("submit", loadScore);
 }
-function checkName(event){
+
+
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===
+// ~~~   loadScore()                                                    ```
+// ~~~   Check to make sure that the user has entered a name, and then  ===
+// ~~~   starts a JSON query to submit it / receive  the high score list===
+// ~~~   Called by the endGame()                                        ===
+// ~~~===---...---===```===---...---===```===---...---===```===---...---===
+function loadScore(event){
     event.preventDefault();
     var newUserName=document.querySelector("#user-name");
     if(newUserName.value!=""){
-        localStorage.setItem("storedName",newUserName.value);
-        var userScore=userHighScore;
+        var userScore=finalScore;
+
+        // If there is a name stored locally, assign it to userStoredName
+        if(userStoredName=localStorage.getItem("storedName")){
+            // If someone is useing the same computer as a previous player, but enters a new name
+            // they deserve to have their score uploaded, even if the previous player was better
+            if(userStoredName===newUserName.value)
+                var userScore=storedHighScore;
+        }
+        // If not, we should store this one
+        else localStorage.setItem("storedName",newUserName.value);
+
         var uriString="http://bork.hampshire.edu/~damien/sixbynine/highScore.php?user="+newUserName.value+"&score="+userScore;
-        console.log(uriString);
+
+        
         var highScoreList=new XMLHttpRequest(); 
         highScoreList.onreadystatechange=displayScore;
         highScoreList.open("POST", uriString, true);
-         highScoreList.send();
+        highScoreList.send();
     }
 }
-// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
-// ~~~   displayScore()                                                    ```
-// ~~~   Downloads the high scores from all players and displays it here   ```
-// ~~~   Called by the endGame()                                           ```
-// ~~~===---...---===```===---...---===```===---...---===```===---...---===```
 
-function loadScore(name){
-
-
-}
 
 // ~~~===---...---===```===---...---===```===---...---===```===---...---===```
 // ~~~   displayScore()                                                    ```
